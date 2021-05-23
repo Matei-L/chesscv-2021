@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">ChessCV</string>
+    <string name="take_photo">Take Photo</string>
+    <string name="choose_photo">Choose Photo</string>
+    <string name="get_board">Get Board</string>
+    <string name="image_of_a_chess_board">Image of a Chess Board</string>
+    <string name="is_facing_white">Board is facing white</string>
+    <string name="board_is_facing_black">Board is facing Black</string>
+    <string name="get_digital_board">Get digital board</string>
+</resources>
