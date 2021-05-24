@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: com.github.bakkenbaeck:chessboardeditor:v1.0.2@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/64746ae7c1a17e55e5a5fe0eefe7508c/jetified-chessboardeditor-v1.0.2/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/64746ae7c1a17e55e5a5fe0eefe7508c/jetified-chessboardeditor-v1.0.2/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/64746ae7c1a17e55e5a5fe0eefe7508c/jetified-chessboardeditor-v1.0.2/AndroidManifest.xml" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.bakkenbaeck/chessboardeditor/v1.0.2/51599d9c39dcea4a464ccf5f86898d410503c429/chessboardeditor-v1.0.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
