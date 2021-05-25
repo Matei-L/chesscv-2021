@@ -28,10 +28,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -105,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
         getBoardButton.setOnClickListener(view -> {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            photo.compress(Bitmap.CompressFormat.JPEG, 0 /*ignored for PNG*/, bos);
+            photo.compress(Bitmap.CompressFormat.JPEG, 100 /*ignored for PNG*/, bos);
             byte[] bitmapdata = bos.toByteArray();
 
             RequestBody requestFile =
@@ -151,8 +153,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void buildRetrofit() {
+
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .connectTimeout(10, TimeUnit.MINUTES)
+                .readTimeout(10, TimeUnit.MINUTES)
+                .writeTimeout(10, TimeUnit.MINUTES)
+                .build();
+
         retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.SERVER_URL)
+                .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         chessCVAPI = retrofit.create(ChessCVAPI.class);
