@@ -11,6 +11,9 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -98,8 +101,15 @@ public class CheckBoardActivity extends AppCompatActivity {
 
 
     private void buildRetrofit() {
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .connectTimeout(1, TimeUnit.MINUTES)
+                .readTimeout(3, TimeUnit.MINUTES)
+                .writeTimeout(15, TimeUnit.MINUTES)
+                .build();
+
         retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.SERVER_URL)
+                .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         chessCVAPI = retrofit.create(ChessCVAPI.class);
