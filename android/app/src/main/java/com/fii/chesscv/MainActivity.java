@@ -16,6 +16,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -28,6 +29,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
@@ -76,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
     private Button choosePhotoButton;
     private Button getBoardButton;
     private Bitmap photo;
+    private Uri takenPhotoUri = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,12 +96,23 @@ public class MainActivity extends AppCompatActivity {
         getBoardButton.setEnabled(false);
 
         takePhotoButton.setOnClickListener(view -> {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if(intent.resolveActivity(getPackageManager()) != null) {
-                startActivityForResult(intent, CAMERA_ACTION_CODE);
-            } else {
-                Toast.makeText(this, "There is no app that can make a photo",
-                        Toast.LENGTH_SHORT).show();
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                File photoFile = null;
+                try {
+                    photoFile = createImageFile();
+                } catch (IOException ex) {
+                    Log.e(TAG, "onCreate: ", ex);
+                }
+                if (photoFile != null) {
+                    Uri photoURI = FileProvider.getUriForFile(this,
+                            "com.example.android.fileprovider",
+                            photoFile);
+                    takenPhotoUri = photoURI;
+                    Log.i(TAG, "onCreate: takenPhotoUri: " + takenPhotoUri);
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    startActivityForResult(takePictureIntent, CAMERA_ACTION_CODE);
+                }
             }
         });
 
@@ -186,21 +201,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CAMERA_ACTION_CODE && resultCode == RESULT_OK && data != null) {
-            Bundle bundle = data.getExtras();
-            Bitmap takenPhoto = (Bitmap) bundle.get("data");
-            selectPhoto(takenPhoto);
+        Uri imageUri = null;
+        if (requestCode == CAMERA_ACTION_CODE && resultCode == RESULT_OK) {
+            imageUri = takenPhotoUri;
         }
         if (requestCode == GALLERY_ACTION_CODE && resultCode == RESULT_OK && data != null) {
-            Uri selectedImageUri = data.getData();
-            if (null != selectedImageUri) {
-                try {
-                    Bitmap selectedPhoto = MediaStore.Images.Media.getBitmap(
-                            this.getContentResolver(), selectedImageUri);
-                    selectPhoto(selectedPhoto);
-                } catch (IOException e) {
-                    Log.e(TAG, "onActivityResult: ", e);
-                }
+            imageUri = data.getData();
+        }
+        Log.i(TAG, "onActivityResult: imageUri: " + imageUri);
+        if (null != imageUri) {
+            try {
+                Bitmap selectedPhoto = MediaStore.Images.Media.getBitmap(
+                        this.getContentResolver(), imageUri);
+                selectPhoto(selectedPhoto);
+            } catch (IOException e) {
+                Log.e(TAG, "onActivityResult: ", e);
             }
         }
     }
@@ -221,5 +236,17 @@ public class MainActivity extends AppCompatActivity {
         imageView.setImageBitmap(photo);
         getBoardButton.setEnabled(true);
         this.photo = photo;
+    }
+
+    private File createImageFile() throws IOException {
+        String imageFileName = "PHOTO";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        return image;
     }
 }
